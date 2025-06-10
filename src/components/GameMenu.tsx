@@ -25,7 +25,7 @@ const GameMenu = ({ onSelectGame }: GameMenuProps) => {
           Paturain Games
         </h1>
         <p className="text-2xl text-gray-300 max-w-2xl mx-auto">
-          Kies je favoriete spelletje en begin met spelen!
+          Duik in de wereld van gaming en beleef het ultieme avontuur!
         </p>
       </div>
 
