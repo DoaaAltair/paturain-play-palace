@@ -15,27 +15,6 @@ const GameMenu = ({ onSelectGame }: GameMenuProps) => {
       description: 'Race met je Paturain flesje door het verkeer!',
       icon: Car,
       color: 'from-blue-500 to-blue-700'
-    },
-    {
-      id: 'snake',
-      title: 'Snake',
-      description: 'Klassiek Snake spel - eet appels en groei!',
-      icon: Gamepad2,
-      color: 'from-green-500 to-emerald-600'
-    },
-    {
-      id: 'memory',
-      title: 'Memory',
-      description: 'Test je geheugen met kaarten matchen',
-      icon: Brain,
-      color: 'from-pink-500 to-rose-600'
-    },
-    {
-      id: 'reaction',
-      title: 'Reactie Test',
-      description: 'Hoe snel zijn jouw reflexen?',
-      icon: Zap,
-      color: 'from-yellow-500 to-orange-600'
     }
   ];
 
