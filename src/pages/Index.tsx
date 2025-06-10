@@ -1,12 +1,27 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from 'react';
+import GameMenu from '@/components/GameMenu';
+import PaturainCarGame from '@/components/games/PaturainCarGame';
 
 const Index = () => {
+  const [currentGame, setCurrentGame] = useState<string | null>(null);
+
+  const handleBackToMenu = () => {
+    setCurrentGame(null);
+  };
+
+  const renderCurrentGame = () => {
+    switch (currentGame) {
+      case 'paturain-racer':
+        return <PaturainCarGame onBackToMenu={handleBackToMenu} />;
+      default:
+        return <GameMenu onSelectGame={setCurrentGame} />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+      {renderCurrentGame()}
     </div>
   );
 };
