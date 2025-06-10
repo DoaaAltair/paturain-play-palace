@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Gamepad2, Brain, Zap, Car, Trophy } from 'lucide-react';
+import { Car, Trophy } from 'lucide-react';
 
 interface GameMenuProps {
   onSelectGame: (game: string) => void;
@@ -19,34 +19,34 @@ const GameMenu = ({ onSelectGame }: GameMenuProps) => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-12">
-        <h1 className="text-6xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+      <div className="text-center mb-16">
+        <h1 className="text-7xl font-bold text-white mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
           Paturain Games
         </h1>
-        <p className="text-xl text-gray-300">
+        <p className="text-2xl text-gray-300 max-w-2xl mx-auto">
           Kies je favoriete spelletje en begin met spelen!
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      <div className="flex flex-col items-center space-y-8 max-w-md w-full">
         {games.map((game) => {
           const IconComponent = game.icon;
           return (
-            <Card key={game.id} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
-              <CardHeader className="text-center">
-                <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r ${game.color} flex items-center justify-center`}>
-                  <IconComponent className="w-8 h-8 text-white" />
+            <Card key={game.id} className="w-full bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
+              <CardHeader className="text-center pb-4">
+                <div className={`w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r ${game.color} flex items-center justify-center shadow-lg`}>
+                  <IconComponent className="w-10 h-10 text-white" />
                 </div>
-                <CardTitle className="text-2xl text-white">{game.title}</CardTitle>
-                <CardDescription className="text-gray-300">
+                <CardTitle className="text-3xl text-white mb-2">{game.title}</CardTitle>
+                <CardDescription className="text-gray-300 text-lg">
                   {game.description}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <Button 
                   onClick={() => onSelectGame(game.id)}
-                  className={`w-full bg-gradient-to-r ${game.color} hover:opacity-90 text-white font-semibold py-3`}
+                  className={`w-full bg-gradient-to-r ${game.color} hover:opacity-90 text-white font-semibold py-4 text-lg rounded-lg`}
                 >
                   Spelen
                 </Button>
@@ -56,12 +56,12 @@ const GameMenu = ({ onSelectGame }: GameMenuProps) => {
         })}
       </div>
 
-      <div className="text-center mt-12">
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20 inline-block">
-          <CardContent className="p-6">
-            <Trophy className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
-            <p className="text-white font-semibold">High Scores</p>
-            <p className="text-gray-300 text-sm">Speel games om je scores bij te houden!</p>
+      <div className="mt-16">
+        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+          <CardContent className="p-8 text-center">
+            <Trophy className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+            <p className="text-white font-semibold text-xl mb-2">High Scores</p>
+            <p className="text-gray-300">Speel games om je scores bij te houden!</p>
           </CardContent>
         </Card>
       </div>
