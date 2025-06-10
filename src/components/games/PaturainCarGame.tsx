@@ -74,20 +74,36 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
     ctx.fillRect(ROAD_X - 5, 0, 5, CANVAS_HEIGHT);
     ctx.fillRect(ROAD_X + ROAD_WIDTH, 0, 5, CANVAS_HEIGHT);
 
+    // // Draw player (Paturain bottle)
+    // const player = gameStateRef.current.player;
+    // ctx.fillStyle = '#2E59C9';
+    // ctx.fillRect(player.x, player.y, player.width, player.height);
+    
+    // // Draw bottle cap
+    // ctx.fillStyle = '#1a4a8a';
+    // ctx.fillRect(player.x + 5, player.y, player.width - 10, 15);
+    
+    // // Draw label
+    // ctx.fillStyle = '#ffffff';
+    // ctx.font = '8px Arial';
+    // ctx.textAlign = 'center';
+    // ctx.fillText('PATURAIN', player.x + player.width/2, player.y + 35);
+    // Laad Paturain-afbeelding
+    const paturainImage = new Image();
+    paturainImage.src = 'paturain.png'; // Vervang dit pad met je eigen afbeeldingspad
+    
     // Draw player (Paturain bottle)
     const player = gameStateRef.current.player;
-    ctx.fillStyle = '#2E59C9';
-    ctx.fillRect(player.x, player.y, player.width, player.height);
     
-    // Draw bottle cap
-    ctx.fillStyle = '#1a4a8a';
-    ctx.fillRect(player.x + 5, player.y, player.width - 10, 15);
-    
-    // Draw label
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '8px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText('PATURAIN', player.x + player.width/2, player.y + 35);
+    // Controleer of de afbeelding geladen is
+    if (paturainImage.complete) {
+        ctx.drawImage(paturainImage, player.x, player.y, player.width, player.height);
+    } else {
+        paturainImage.onload = () => {
+            ctx.drawImage(paturainImage, player.x, player.y, player.width, player.height);
+        };
+    }
+
 
     // Draw obstacles (other cars)
     ctx.fillStyle = '#ff4444';
