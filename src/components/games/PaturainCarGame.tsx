@@ -90,7 +90,7 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
     // ctx.fillText('PATURAIN', player.x + player.width/2, player.y + 35);
     // Laad Paturain-afbeelding
     const paturainImage = new Image();
-    paturainImage.src = '/paturain.png'; 
+    paturainImage.src = './paturain.png'; 
     
     // Draw player (Paturain bottle)
     const player = gameStateRef.current.player;
