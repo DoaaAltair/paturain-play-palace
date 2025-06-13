@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,28 +20,28 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [highScore, setHighScore] = useState(0);
-  
+
+  const CANVAS_WIDTH = 600;
+  const CANVAS_HEIGHT = 400;
+  const ROAD_WIDTH = 300;
+  const ROAD_Y = (CANVAS_HEIGHT - ROAD_WIDTH) / 2;
+
   // Game state
   const gameStateRef = useRef({
-    player: { x: 200, y: 450, width: 40, height: 60 },
+    player: { x: 50, y: ROAD_Y + (ROAD_WIDTH - 90) / 2, width: 60, height: 90 },
     obstacles: [] as GameObject[],
     gameSpeed: 2,
     spawnTimer: 0,
-    keys: { left: false, right: false }
+    keys: { up: false, down: false }
   });
-
-  const CANVAS_WIDTH = 400;
-  const CANVAS_HEIGHT = 600;
-  const ROAD_WIDTH = 300;
-  const ROAD_X = (CANVAS_WIDTH - ROAD_WIDTH) / 2;
 
   const resetGame = () => {
     gameStateRef.current = {
-      player: { x: 200, y: 450, width: 40, height: 60 },
+      player: { x: 50, y: ROAD_Y + (ROAD_WIDTH - 90) / 2, width: 60, height: 90 },
       obstacles: [],
       gameSpeed: 2,
       spawnTimer: 0,
-      keys: { left: false, right: false }
+      keys: { up: false, down: false }
     };
     setScore(0);
     setGameOver(false);
@@ -51,7 +50,7 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
   const drawGame = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -61,58 +60,48 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
 
     // Draw road
     ctx.fillStyle = '#4a4a4a';
-    ctx.fillRect(ROAD_X, 0, ROAD_WIDTH, CANVAS_HEIGHT);
+    ctx.fillRect(0, ROAD_Y, CANVAS_WIDTH, ROAD_WIDTH);
 
     // Draw road lines
     ctx.fillStyle = '#ffffff';
-    for (let y = 0; y < CANVAS_HEIGHT; y += 40) {
-      ctx.fillRect(CANVAS_WIDTH / 2 - 2, y, 4, 20);
+    for (let x = 0; x < CANVAS_WIDTH; x += 40) {
+      ctx.fillRect(x, CANVAS_HEIGHT / 2 - 2, 20, 4);
     }
 
     // Draw road borders
     ctx.fillStyle = '#2E59C9';
-    ctx.fillRect(ROAD_X - 5, 0, 5, CANVAS_HEIGHT);
-    ctx.fillRect(ROAD_X + ROAD_WIDTH, 0, 5, CANVAS_HEIGHT);
+    ctx.fillRect(0, ROAD_Y - 5, CANVAS_WIDTH, 5);
+    ctx.fillRect(0, ROAD_Y + ROAD_WIDTH, CANVAS_WIDTH, 5);
 
-    // // Draw player (Paturain bottle)
-    // const player = gameStateRef.current.player;
-    // ctx.fillStyle = '#2E59C9';
-    // ctx.fillRect(player.x, player.y, player.width, player.height);
-    
-    // // Draw bottle cap
-    // ctx.fillStyle = '#1a4a8a';
-    // ctx.fillRect(player.x + 5, player.y, player.width - 10, 15);
-    
-    // // Draw label
-    // ctx.fillStyle = '#ffffff';
-    // ctx.font = '8px Arial';
-    // ctx.textAlign = 'center';
-    // ctx.fillText('PATURAIN', player.x + player.width/2, player.y + 35);
     // Laad Paturain-afbeelding
     const paturainImage = new Image();
-    paturainImage.src = './paturain.png'; 
-    
+    paturainImage.src = '/paturain-auto.png';
+
     // Draw player (Paturain bottle)
     const player = gameStateRef.current.player;
-    
+
     // Controleer of de afbeelding geladen is
     if (paturainImage.complete) {
-        ctx.drawImage(paturainImage, player.x, player.y, player.width, player.height);
+      ctx.drawImage(paturainImage, player.x, player.y, player.width, player.height);
     } else {
-        paturainImage.onload = () => {
-            ctx.drawImage(paturainImage, player.x, player.y, player.width, player.height);
-        };
+      paturainImage.onload = () => {
+        ctx.drawImage(paturainImage, player.x, player.y, player.width, player.height);
+      };
     }
 
+    // Laad rode auto afbeelding
+    const redCarImage = new Image();
+    redCarImage.src = '/rode-auto.png';
 
     // Draw obstacles (other cars)
-    ctx.fillStyle = '#ff4444';
     gameStateRef.current.obstacles.forEach(obstacle => {
-      ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-      // Car windows
-      ctx.fillStyle = '#333333';
-      ctx.fillRect(obstacle.x + 5, obstacle.y + 10, obstacle.width - 10, 15);
-      ctx.fillStyle = '#ff4444';
+      if (redCarImage.complete) {
+        ctx.drawImage(redCarImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      } else {
+        redCarImage.onload = () => {
+          ctx.drawImage(redCarImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        };
+      }
     });
 
   }, []);
@@ -121,42 +110,45 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
     if (!isPlaying || gameOver) return;
 
     const state = gameStateRef.current;
-    
+
     // Move player
-    if (state.keys.left && state.player.x > ROAD_X) {
-      state.player.x -= 5;
+    if (state.keys.up && state.player.y > ROAD_Y) {
+      state.player.y -= 5;
     }
-    if (state.keys.right && state.player.x < ROAD_X + ROAD_WIDTH - state.player.width) {
-      state.player.x += 5;
+    if (state.keys.down && state.player.y < ROAD_Y + ROAD_WIDTH - state.player.height) {
+      state.player.y += 5;
     }
 
     // Spawn obstacles
     state.spawnTimer++;
-    if (state.spawnTimer > 60 / state.gameSpeed) {
-      const laneWidth = ROAD_WIDTH / 3;
-      const lane = Math.floor(Math.random() * 3);
+    if (state.spawnTimer > 180 / state.gameSpeed) {
+      // Bereken een willekeurige positie binnen de weg
+      const minY = ROAD_Y + 20; // 20 pixels van de bovenkant van de weg
+      const maxY = ROAD_Y + ROAD_WIDTH - 120; // 120 pixels van de onderkant (rekening houdend met auto hoogte)
+      const randomY = minY + Math.random() * (maxY - minY);
+
       state.obstacles.push({
-        x: ROAD_X + lane * laneWidth + (laneWidth - 40) / 2,
-        y: -60,
-        width: 40,
-        height: 60
+        x: CANVAS_WIDTH,
+        y: randomY,
+        width: 80,
+        height: 100
       });
       state.spawnTimer = 0;
     }
 
     // Move obstacles
     state.obstacles = state.obstacles.filter(obstacle => {
-      obstacle.y += state.gameSpeed;
-      return obstacle.y < CANVAS_HEIGHT;
+      obstacle.x -= state.gameSpeed;
+      return obstacle.x > -80;
     });
 
     // Check collisions
     const player = state.player;
     for (const obstacle of state.obstacles) {
       if (player.x < obstacle.x + obstacle.width &&
-          player.x + player.width > obstacle.x &&
-          player.y < obstacle.y + obstacle.height &&
-          player.y + player.height > obstacle.y) {
+        player.x + player.width > obstacle.x &&
+        player.y < obstacle.y + obstacle.height &&
+        player.y + player.height > obstacle.y) {
         setGameOver(true);
         setIsPlaying(false);
         if (score > highScore) {
@@ -187,13 +179,13 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') gameStateRef.current.keys.left = true;
-      if (e.key === 'ArrowRight') gameStateRef.current.keys.right = true;
+      if (e.key === 'ArrowUp') gameStateRef.current.keys.up = true;
+      if (e.key === 'ArrowDown') gameStateRef.current.keys.down = true;
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') gameStateRef.current.keys.left = false;
-      if (e.key === 'ArrowRight') gameStateRef.current.keys.right = false;
+      if (e.key === 'ArrowUp') gameStateRef.current.keys.up = false;
+      if (e.key === 'ArrowDown') gameStateRef.current.keys.down = false;
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -206,7 +198,9 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
   }, []);
 
   const startGame = () => {
-    resetGame();
+    if (gameOver) {
+      resetGame();
+    }
     setIsPlaying(true);
   };
 
@@ -227,11 +221,11 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
             <div className="w-20"></div>
           </div>
         </CardHeader>
-        
+
         <CardContent className="p-6">
-          <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex flex-col gap-6">
             {/* Game Canvas */}
-            <div className="flex-1 flex justify-center">
+            <div className="flex justify-center">
               <div className="relative">
                 <canvas
                   ref={canvasRef}
@@ -240,7 +234,7 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
                   className="border-4 rounded-lg shadow-lg"
                   style={{ borderColor: '#2E59C9' }}
                 />
-                
+
                 {gameOver && (
                   <div className="absolute inset-0 bg-black/75 flex items-center justify-center rounded-lg">
                     <div className="text-center text-white">
@@ -257,8 +251,8 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
             </div>
 
             {/* Game Info */}
-            <div className="lg:w-64 space-y-4">
-              <Card style={{ backgroundColor: '#f8faff', borderColor: '#2E59C9' }}>
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
+              <Card style={{ backgroundColor: '#f8faff', borderColor: '#2E59C9' }} className="flex-1 max-w-xs">
                 <CardContent className="p-4">
                   <div className="text-center space-y-2">
                     <div>
@@ -273,32 +267,32 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
                 </CardContent>
               </Card>
 
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2 max-w-xs">
                 {!isPlaying && !gameOver && (
                   <Button onClick={startGame} className="w-full" style={{ backgroundColor: '#2E59C9' }}>
                     <Play className="w-4 h-4 mr-2" />
                     Start Spel
                   </Button>
                 )}
-                
+
                 {isPlaying && (
                   <Button onClick={togglePause} className="w-full" style={{ backgroundColor: '#2E59C9' }}>
                     <Pause className="w-4 h-4 mr-2" />
                     Pauzeer
                   </Button>
                 )}
-                
+
                 <Button onClick={resetGame} variant="outline" className="w-full" style={{ borderColor: '#2E59C9', color: '#2E59C9' }}>
                   <RotateCcw className="w-4 h-4 mr-2" />
                   Reset
                 </Button>
               </div>
 
-              <Card style={{ backgroundColor: '#f8faff', borderColor: '#2E59C9' }}>
+              <Card style={{ backgroundColor: '#f8faff', borderColor: '#2E59C9' }} className="flex-1 max-w-xs">
                 <CardContent className="p-4">
                   <h4 className="font-semibold mb-2" style={{ color: '#2E59C9' }}>Besturing:</h4>
                   <div className="text-sm space-y-1">
-                    <p>← → Pijltjestoetsen om te sturen</p>
+                    <p>↑ ↓ Pijltjestoetsen om te sturen</p>
                     <p>Ontwijt andere auto's!</p>
                     <p>Hoe langer je overleeft, hoe sneller het wordt!</p>
                   </div>
