@@ -1,73 +1,109 @@
-# Welcome to your Lovable project
+# 🎮 Paturain Play Palace
 
-## Project info
+Een interactieve gaming ervaring gebouwd met React en TypeScript, waar spelers kunnen genieten van de Paturain Racer game.
 
-**URL**: https://lovable.dev/projects/dab561f7-aa95-494a-984b-f756ec37e1bd
+## 🚀 Features
 
-## How can I edit this code?
+### Paturain Racer
+- **Dynamisch Gameplay**: Race met je Paturain auto door het verkeer
+- **Score Systeem**: 
+  - Verdien punten door te overleven
+  - Verzamel Paturain pakken voor bonus punten
+  - Houd je high score bij
+- **Geluideffecten**:
+  - Start geluid
+  - Rijgeluid tijdens het spelen
+  - Game over geluid
+- **Responsive Design**: Speel op verschillende schermformaten
+- **Leaderboard**: Bekijk de top 3 spelers
 
-There are several ways of editing your application.
+## 🎯 Spelregels
 
-**Use Lovable**
+### Besturing
+- Gebruik de pijltjestoetsen omhoog en omlaag om te sturen
+- Ontwijk de rode auto's
+- Vang Paturain pakken voor 50 bonus punten
+- Het spel wordt sneller na elke 500 punten
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/dab561f7-aa95-494a-984b-f756ec37e1bd) and start prompting.
+### Punten verdienen
+- 1 punt per seconde overleven
+- 50 bonus punten per Paturain pak
+- Probeer je high score te verbeteren!
 
-Changes made via Lovable will be committed automatically to this repo.
+## 🛠️ Technische Stack
 
-**Use your preferred IDE**
+- **Frontend**: React + TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: Shadcn/ui
+- **Icons**: Lucide Icons
+- **Audio**: HTML5 Audio API
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🚀 Installatie
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+1. Clone de repository:
+```bash
+git clone [repository-url]
+```
 
-Follow these steps:
+2. Installeer dependencies:
+```bash
+npm install
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Start de development server:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+4. Open [http://localhost:3000](http://localhost:3000) in je browser
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📁 Project Structuur
 
-**Use GitHub Codespaces**
+```
+paturain-play-palace/
+├── public/
+│   ├── sounds/           # Game geluiden
+│   │   ├── game-start.mp3
+│   │   ├── car-driving.mp3
+│   │   └── game-over.mp3
+│   ├── paturain-auto.png # Speler auto
+│   ├── rode-auto.png     # Obstakel auto's
+│   └── paturain-pak.png  # Bonus items
+├── src/
+│   ├── components/
+│   │   ├── games/        # Game componenten
+│   │   └── ui/           # UI componenten
+│   └── ...
+└── ...
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🎨 Customisatie
 
-## What technologies are used for this project?
+### Geluiden aanpassen
+Vervang de geluidsbestanden in de `public/sounds` map:
+- `game-start.mp3`
+- `car-driving.mp3`
+- `game-over.mp3`
 
-This project is built with:
+### Afbeeldingen aanpassen
+Vervang de afbeeldingen in de `public` map:
+- `paturain-auto.png`
+- `rode-auto.png`
+- `paturain-pak.png`
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🤝 Bijdragen
 
-## How can I deploy this project?
+1. Fork de repository
+2. Maak een nieuwe branch (`git checkout -b feature/AmazingFeature`)
+3. Commit je wijzigingen (`git commit -m 'Add some AmazingFeature'`)
+4. Push naar de branch (`git push origin feature/AmazingFeature`)
+5. Open een Pull Request
 
-Simply open [Lovable](https://lovable.dev/projects/dab561f7-aa95-494a-984b-f756ec37e1bd) and click on Share -> Publish.
+## 📝 Licentie
 
-## Can I connect a custom domain to my Lovable project?
+Dit project is gelicenseerd onder de MIT License - zie het [LICENSE](LICENSE) bestand voor details.
 
-Yes, you can!
+## 🙏 Credits
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- Ontwikkeld door [Jouw Naam/Team]
+- Speciale dank aan alle testers en bijdragers
