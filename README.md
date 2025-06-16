@@ -99,11 +99,7 @@ Vervang de afbeeldingen in de `public` map:
 4. Push naar de branch (`git push origin feature/AmazingFeature`)
 5. Open een Pull Request
 
-## 📝 Licentie
-
-Dit project is gelicenseerd onder de MIT License - zie het [LICENSE](LICENSE) bestand voor details.
-
 ## 🙏 Credits
 
-- Ontwikkeld door [Jouw Naam/Team]
+- Ontwikkeld door Doaa Altair
 - Speciale dank aan alle testers en bijdragers
