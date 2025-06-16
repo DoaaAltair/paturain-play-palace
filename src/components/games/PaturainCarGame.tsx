@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Play, Pause, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 
 interface PaturainCarGameProps {
   onBackToMenu: () => void;
@@ -12,6 +12,7 @@ interface GameObject {
   y: number;
   width: number;
   height: number;
+  type: 'car' | 'package';  // Add type to distinguish between cars and packages
 }
 
 const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
@@ -20,6 +21,13 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [highScore, setHighScore] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+  const [bonusPoints, setBonusPoints] = useState(0);
+
+  // Audio refs
+  const startSoundRef = useRef<HTMLAudioElement | null>(null);
+  const drivingSoundRef = useRef<HTMLAudioElement | null>(null);
+  const gameOverSoundRef = useRef<HTMLAudioElement | null>(null);
 
   const CANVAS_WIDTH = 600;
   const CANVAS_HEIGHT = 400;
@@ -32,6 +40,7 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
     obstacles: [] as GameObject[],
     gameSpeed: 2,
     spawnTimer: 0,
+    packageSpawnTimer: 0,
     keys: { up: false, down: false }
   });
 
@@ -41,9 +50,11 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
       obstacles: [],
       gameSpeed: 2,
       spawnTimer: 0,
+      packageSpawnTimer: 0,
       keys: { up: false, down: false }
     };
     setScore(0);
+    setBonusPoints(0);
     setGameOver(false);
   };
 
@@ -73,14 +84,18 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
     ctx.fillRect(0, ROAD_Y - 5, CANVAS_WIDTH, 5);
     ctx.fillRect(0, ROAD_Y + ROAD_WIDTH, CANVAS_WIDTH, 5);
 
-    // Laad Paturain-afbeelding
+    // Load images
     const paturainImage = new Image();
     paturainImage.src = '/paturain-auto.png';
 
-    // Draw player (Paturain bottle)
-    const player = gameStateRef.current.player;
+    const redCarImage = new Image();
+    redCarImage.src = '/rode-auto.png';
 
-    // Controleer of de afbeelding geladen is
+    const packageImage = new Image();
+    packageImage.src = '/paturain-pak.png';
+
+    // Draw player
+    const player = gameStateRef.current.player;
     if (paturainImage.complete) {
       ctx.drawImage(paturainImage, player.x, player.y, player.width, player.height);
     } else {
@@ -89,18 +104,24 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
       };
     }
 
-    // Laad rode auto afbeelding
-    const redCarImage = new Image();
-    redCarImage.src = '/rode-auto.png';
-
-    // Draw obstacles (other cars)
+    // Draw obstacles and packages
     gameStateRef.current.obstacles.forEach(obstacle => {
-      if (redCarImage.complete) {
-        ctx.drawImage(redCarImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-      } else {
-        redCarImage.onload = () => {
+      if (obstacle.type === 'car') {
+        if (redCarImage.complete) {
           ctx.drawImage(redCarImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-        };
+        } else {
+          redCarImage.onload = () => {
+            ctx.drawImage(redCarImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+          };
+        }
+      } else if (obstacle.type === 'package') {
+        if (packageImage.complete) {
+          ctx.drawImage(packageImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        } else {
+          packageImage.onload = () => {
+            ctx.drawImage(packageImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+          };
+        }
       }
     });
 
@@ -119,44 +140,67 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
       state.player.y += 5;
     }
 
-    // Spawn obstacles
+    // Spawn obstacles (cars) - reduced frequency
     state.spawnTimer++;
-    if (state.spawnTimer > 180 / state.gameSpeed) {
-      // Bereken een willekeurige positie binnen de weg
-      const minY = ROAD_Y + 20; // 20 pixels van de bovenkant van de weg
-      const maxY = ROAD_Y + ROAD_WIDTH - 120; // 120 pixels van de onderkant (rekening houdend met auto hoogte)
+    if (state.spawnTimer > 300 / state.gameSpeed) {
+      const minY = ROAD_Y + 20;
+      const maxY = ROAD_Y + ROAD_WIDTH - 100;
       const randomY = minY + Math.random() * (maxY - minY);
 
       state.obstacles.push({
         x: CANVAS_WIDTH,
         y: randomY,
-        width: 80,
-        height: 100
+        width: 60,
+        height: 80,
+        type: 'car'
       });
       state.spawnTimer = 0;
     }
 
-    // Move obstacles
+    // Spawn packages
+    state.packageSpawnTimer++;
+    if (state.packageSpawnTimer > 400 / state.gameSpeed) {
+      const minY = ROAD_Y + 20;
+      const maxY = ROAD_Y + ROAD_WIDTH - 80;
+      const randomY = minY + Math.random() * (maxY - minY);
+
+      state.obstacles.push({
+        x: CANVAS_WIDTH,
+        y: randomY,
+        width: 60,
+        height: 60,
+        type: 'package'
+      });
+      state.packageSpawnTimer = 0;
+    }
+
+    // Move obstacles and check collisions
     state.obstacles = state.obstacles.filter(obstacle => {
       obstacle.x -= state.gameSpeed;
-      return obstacle.x > -80;
-    });
 
-    // Check collisions
-    const player = state.player;
-    for (const obstacle of state.obstacles) {
+      // Check collision with player
+      const player = state.player;
       if (player.x < obstacle.x + obstacle.width &&
         player.x + player.width > obstacle.x &&
         player.y < obstacle.y + obstacle.height &&
         player.y + player.height > obstacle.y) {
-        setGameOver(true);
-        setIsPlaying(false);
-        if (score > highScore) {
-          setHighScore(score);
+
+        if (obstacle.type === 'car') {
+          playGameOverSound();
+          setGameOver(true);
+          setIsPlaying(false);
+          if (score > highScore) {
+            setHighScore(score);
+          }
+          return false;
+        } else if (obstacle.type === 'package') {
+          setBonusPoints(prev => prev + 50);
+          return false;
         }
-        return;
       }
-    }
+
+      return obstacle.x > -80;
+    });
 
     // Increase score and speed
     setScore(prev => prev + 1);
@@ -197,16 +241,112 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
     };
   }, []);
 
+  // Audio control functions
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (startSoundRef.current) startSoundRef.current.muted = !isMuted;
+    if (drivingSoundRef.current) drivingSoundRef.current.muted = !isMuted;
+    if (gameOverSoundRef.current) gameOverSoundRef.current.muted = !isMuted;
+  };
+
+  const playStartSound = () => {
+    if (startSoundRef.current && !isMuted) {
+      startSoundRef.current.currentTime = 0;
+      startSoundRef.current.play();
+    }
+  };
+
+  const playDrivingSound = useCallback(() => {
+    const drivingSound = drivingSoundRef.current;
+    if (!drivingSound) {
+      console.log("Driving sound element not found");
+      return;
+    }
+
+    if (isMuted) {
+      console.log("Sound is muted");
+      return;
+    }
+
+    try {
+      drivingSound.volume = 0.5;
+      drivingSound.loop = true;
+      drivingSound.currentTime = 0;
+
+      // Force load the audio
+      drivingSound.load();
+
+      const playPromise = drivingSound.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log("Driving sound started playing");
+          })
+          .catch(error => {
+            console.error("Error playing driving sound:", error);
+          });
+      }
+    } catch (error) {
+      console.error("Error in playDrivingSound:", error);
+    }
+  }, [isMuted]);
+
+  const playGameOverSound = () => {
+    if (gameOverSoundRef.current && !isMuted) {
+      drivingSoundRef.current?.pause();
+      gameOverSoundRef.current.currentTime = 0;
+      gameOverSoundRef.current.play();
+    }
+  };
+
+  // Audio effects
+  useEffect(() => {
+    console.log("Game state changed:", { isPlaying, gameOver });
+
+    if (isPlaying && !gameOver) {
+      console.log("Attempting to play driving sound");
+      playDrivingSound();
+    } else {
+      console.log("Stopping driving sound");
+      if (drivingSoundRef.current) {
+        drivingSoundRef.current.pause();
+        drivingSoundRef.current.currentTime = 0;
+      }
+    }
+  }, [isPlaying, gameOver, playDrivingSound]);
+
   const startGame = () => {
     if (gameOver) {
       resetGame();
     }
     setIsPlaying(true);
+    playStartSound();
   };
 
   const togglePause = () => {
     setIsPlaying(!isPlaying);
+    if (isPlaying) {
+      console.log("Pausing game and sound");
+      drivingSoundRef.current?.pause();
+    } else {
+      console.log("Resuming game and sound");
+      playDrivingSound();
+    }
   };
+
+  // Initialize audio when component mounts
+  useEffect(() => {
+    const drivingSound = drivingSoundRef.current;
+    if (drivingSound) {
+      drivingSound.addEventListener('canplaythrough', () => {
+        console.log("Driving sound is ready to play");
+      });
+
+      drivingSound.addEventListener('error', (e) => {
+        console.error("Error loading driving sound:", e);
+      });
+    }
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#f0f4ff' }}>
@@ -218,9 +358,29 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
               Menu
             </Button>
             <CardTitle className="text-2xl font-bold">Paturain Racer</CardTitle>
-            <div className="w-20"></div>
+            <Button variant="ghost" onClick={toggleMute} className="text-white hover:bg-white/20">
+              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </Button>
           </div>
         </CardHeader>
+
+        {/* Audio elements */}
+        <audio
+          ref={startSoundRef}
+          src="/sounds/game-start.mp3"
+          preload="auto"
+        />
+        <audio
+          ref={drivingSoundRef}
+          src="/sounds/car-driving.mp3"
+          preload="auto"
+          crossOrigin="anonymous"
+        />
+        <audio
+          ref={gameOverSoundRef}
+          src="/sounds/game-over.mp3"
+          preload="auto"
+        />
 
         <CardContent className="p-6">
           <div className="flex flex-col gap-6">
@@ -260,6 +420,10 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
                       <p className="text-2xl font-bold" style={{ color: '#2E59C9' }}>{score}</p>
                     </div>
                     <div>
+                      <p className="text-sm text-gray-600">Bonus Points</p>
+                      <p className="text-xl font-semibold" style={{ color: '#2E59C9' }}>{bonusPoints}</p>
+                    </div>
+                    <div>
                       <p className="text-sm text-gray-600">High Score</p>
                       <p className="text-xl font-semibold" style={{ color: '#2E59C9' }}>{highScore}</p>
                     </div>
@@ -293,7 +457,8 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
                   <h4 className="font-semibold mb-2" style={{ color: '#2E59C9' }}>Besturing:</h4>
                   <div className="text-sm space-y-1">
                     <p>↑ ↓ Pijltjestoetsen om te sturen</p>
-                    <p>Ontwijt andere auto's!</p>
+                    <p>Ontwijt de rode auto's!</p>
+                    <p>Vang de Paturain verpakkingen voor 50 bonus punten!</p>
                     <p>Hoe langer je overleeft, hoe sneller het wordt!</p>
                   </div>
                 </CardContent>
