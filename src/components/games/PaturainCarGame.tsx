@@ -413,18 +413,18 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
         {/* Audio elements */}
         <audio
           ref={startSoundRef}
-          src="/sounds/game-start.mp3"
+          src="/game-start.mp3"
           preload="auto"
         />
         <audio
           ref={drivingSoundRef}
-          src="/sounds/car-driving.mp3"
+          src="/car-driving.mp3"
           preload="auto"
           crossOrigin="anonymous"
         />
         <audio
           ref={gameOverSoundRef}
-          src="/sounds/game-over.mp3"
+          src="/game-over.mp3"
           preload="auto"
         />
 
