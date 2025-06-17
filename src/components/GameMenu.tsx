@@ -13,7 +13,7 @@ const GameMenu = ({ onSelectGame }: GameMenuProps) => {
       title: 'Paturain Racer',
       description: 'Race met je Paturain flesje door het verkeer!',
       icon: Car,
-      color: 'from-blue-500 to-blue-700'
+      color: '#2f57a4'
     }
   ];
 
@@ -43,12 +43,12 @@ const GameMenu = ({ onSelectGame }: GameMenuProps) => {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8" style={{ backgroundColor: '#fff6d9' }}>
       <div className="text-center mb-16">
-        <h1 className="text-7xl font-bold text-white mb-6 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <h1 className="text-7xl font-bold mb-6" style={{ color: '#2f57a4' }}>
           Paturain Games
         </h1>
-        <p className="text-2xl text-gray-300 max-w-2xl mx-auto">
+        <p className="text-2xl max-w-2xl mx-auto" style={{ color: '#2f57a4' }}>
           Duik in de wereld van gaming en beleef het ultieme avontuur!
         </p>
       </div>
@@ -57,20 +57,32 @@ const GameMenu = ({ onSelectGame }: GameMenuProps) => {
         {games.map((game) => {
           const IconComponent = game.icon;
           return (
-            <Card key={game.id} className="w-full bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105">
-              <CardHeader className="text-center pb-4">
-                <div className={`w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r ${game.color} flex items-center justify-center shadow-lg`}>
-                  <IconComponent className="w-10 h-10 text-white" />
+            <Card key={game.id} className="w-full border-0 shadow-2xl overflow-hidden transition-all duration-300 hover:scale-105" style={{ backgroundColor: '#f5f5f5' }}>
+              <CardHeader className="text-center pb-4 relative overflow-hidden" style={{ backgroundColor: '#2f57a4' }}>
+                {/* Decorative elements */}
+                <div className="absolute inset-0 opacity-10">
+                  <div className="absolute top-0 left-0 w-16 h-16 border-4 border-white rounded-full -translate-x-8 -translate-y-8"></div>
+                  <div className="absolute bottom-0 right-0 w-12 h-12 border-4 border-white rounded-full translate-x-6 translate-y-6"></div>
                 </div>
-                <CardTitle className="text-3xl text-white mb-2">{game.title}</CardTitle>
-                <CardDescription className="text-gray-300 text-lg">
-                  {game.description}
-                </CardDescription>
+
+                <div className="relative z-10">
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center shadow-lg" style={{ backgroundColor: '#fff6d9' }}>
+                    <IconComponent className="w-10 h-10" style={{ color: '#2f57a4' }} />
+                  </div>
+                  <CardTitle className="text-3xl text-white mb-2">{game.title}</CardTitle>
+                  <CardDescription className="text-white/90 text-lg">
+                    {game.description}
+                  </CardDescription>
+                </div>
               </CardHeader>
-              <CardContent className="pt-0">
+              <CardContent className="pt-6">
                 <Button
                   onClick={() => onSelectGame(game.id)}
-                  className={`w-full bg-gradient-to-r ${game.color} hover:opacity-90 text-white font-semibold py-4 text-lg rounded-lg`}
+                  className="w-full py-4 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105"
+                  style={{
+                    backgroundColor: '#2f57a4',
+                    color: 'white'
+                  }}
                 >
                   Spelen
                 </Button>
@@ -81,37 +93,43 @@ const GameMenu = ({ onSelectGame }: GameMenuProps) => {
       </div>
 
       <div className="mt-16 w-full max-w-md">
-        <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-white text-2xl flex items-center justify-center">
-              <Trophy className="w-8 h-8 text-yellow-400 mr-2" />
+        <Card className="border-0 shadow-2xl overflow-hidden" style={{ backgroundColor: '#f5f5f5' }}>
+          <CardHeader className="pb-2 relative overflow-hidden" style={{ backgroundColor: '#2f57a4' }}>
+            {/* Decorative elements */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-12 h-12 border-4 border-white rounded-full translate-x-6 -translate-y-6"></div>
+              <div className="absolute bottom-0 left-0 w-8 h-8 border-4 border-white rounded-full -translate-x-4 translate-y-4"></div>
+            </div>
+
+            <CardTitle className="text-white text-2xl flex items-center justify-center relative z-10">
+              <Trophy className="w-8 h-8 mr-2" style={{ color: '#fff6d9' }} />
               Top 3 Spelers
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="p-6">
             <div className="space-y-4">
               {topPlayers.map((player, index) => (
-                <div key={player.id} className="flex items-center justify-between bg-white/5 rounded-lg p-3">
+                <div key={player.id} className="flex items-center justify-between p-4 rounded-xl transition-all duration-300 hover:scale-105" style={{ backgroundColor: '#fff6d9' }}>
                   <div className="flex items-center space-x-3">
                     <div className="relative">
-                      <div className="w-12 h-12 rounded-full overflow-hidden">
+                      <div className="w-12 h-12 rounded-full overflow-hidden border-2" style={{ borderColor: '#2f57a4' }}>
                         <img
                           src={player.image}
                           alt={player.name}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="absolute -top-1 -left-1 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-md">
-                        <span className="text-sm font-bold text-blue-600">{index + 1}</span>
+                      <div className="absolute -top-1 -left-1 w-6 h-6 rounded-full flex items-center justify-center shadow-md" style={{ backgroundColor: '#2f57a4' }}>
+                        <span className="text-sm font-bold text-white">{index + 1}</span>
                       </div>
                     </div>
                     <div>
-                      <p className="text-white font-semibold">{player.name}</p>
-                      <p className="text-gray-400 text-sm">{player.level}</p>
+                      <p className="font-semibold" style={{ color: '#2f57a4' }}>{player.name}</p>
+                      <p className="text-sm" style={{ color: '#2f57a4' }}>{player.level}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-yellow-400 text-sm font-bold">{player.score} pts</p>
+                    <p className="text-sm font-bold" style={{ color: '#2f57a4' }}>{player.score} pts</p>
                   </div>
                 </div>
               ))}
