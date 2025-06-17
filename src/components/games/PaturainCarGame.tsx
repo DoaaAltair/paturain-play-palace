@@ -65,22 +65,22 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
-    ctx.fillStyle = '#1a1a1a';
+    // Clear canvas with cream background
+    ctx.fillStyle = '#fff6d9';
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    // Draw road
-    ctx.fillStyle = '#4a4a4a';
+    // Draw road with light gray
+    ctx.fillStyle = '#f5f5f5';
     ctx.fillRect(0, ROAD_Y, CANVAS_WIDTH, ROAD_WIDTH);
 
-    // Draw road lines
-    ctx.fillStyle = '#ffffff';
+    // Draw road lines with blue
+    ctx.fillStyle = '#2f57a4';
     for (let x = 0; x < CANVAS_WIDTH; x += 40) {
       ctx.fillRect(x, CANVAS_HEIGHT / 2 - 2, 20, 4);
     }
 
-    // Draw road borders
-    ctx.fillStyle = '#2E59C9';
+    // Draw road borders with blue
+    ctx.fillStyle = '#2f57a4';
     ctx.fillRect(0, ROAD_Y - 5, CANVAS_WIDTH, 5);
     ctx.fillRect(0, ROAD_Y + ROAD_WIDTH, CANVAS_WIDTH, 5);
 
@@ -115,6 +115,27 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
           };
         }
       } else if (obstacle.type === 'package') {
+        // Draw beautiful round shadow for package
+        const shadowX = obstacle.x + obstacle.width / 2;
+        const shadowY = obstacle.y + obstacle.height + 5;
+        const shadowWidth = obstacle.width + 10;
+        const shadowHeight = 12;
+
+        // Create gradient for shadow
+        const shadowGradient = ctx.createRadialGradient(
+          shadowX, shadowY, 0,
+          shadowX, shadowY, shadowWidth / 2
+        );
+        shadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0.4)');
+        shadowGradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.2)');
+        shadowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+        // Draw elliptical shadow
+        ctx.fillStyle = shadowGradient;
+        ctx.beginPath();
+        ctx.ellipse(shadowX, shadowY, shadowWidth / 2, shadowHeight / 2, 0, 0, 2 * Math.PI);
+        ctx.fill();
+
         if (packageImage.complete) {
           ctx.drawImage(packageImage, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
         } else {
@@ -223,11 +244,17 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault(); // Prevent page scrolling
+      }
       if (e.key === 'ArrowUp') gameStateRef.current.keys.up = true;
       if (e.key === 'ArrowDown') gameStateRef.current.keys.down = true;
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault(); // Prevent page scrolling
+      }
       if (e.key === 'ArrowUp') gameStateRef.current.keys.up = false;
       if (e.key === 'ArrowDown') gameStateRef.current.keys.down = false;
     };
@@ -349,17 +376,36 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#f0f4ff' }}>
-      <Card className="w-full max-w-2xl bg-white shadow-2xl">
-        <CardHeader className="text-center" style={{ backgroundColor: '#2E59C9', color: 'white' }}>
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" onClick={onBackToMenu} className="text-white hover:bg-white/20">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Menu
+    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#fff6d9' }}>
+      <Card className="w-full max-w-2xl bg-white shadow-2xl border-0 overflow-hidden">
+        <CardHeader className="text-center relative overflow-hidden" style={{ backgroundColor: '#2f57a4' }}>
+          {/* Decorative background pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-0 w-20 h-20 border-4 border-white rounded-full -translate-x-10 -translate-y-10"></div>
+            <div className="absolute top-0 right-0 w-16 h-16 border-4 border-white rounded-full translate-x-8 -translate-y-8"></div>
+            <div className="absolute bottom-0 left-0 w-12 h-12 border-4 border-white rounded-full -translate-x-6 translate-y-6"></div>
+            <div className="absolute bottom-0 right-0 w-24 h-24 border-4 border-white rounded-full translate-x-12 translate-y-12"></div>
+          </div>
+
+          <div className="flex items-center justify-between relative z-10">
+            <Button
+              variant="ghost"
+              onClick={onBackToMenu}
+              className="text-white hover:bg-white/20 transition-all duration-300 rounded-full p-3"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+            >
+              <ArrowLeft className="w-5 h-5" />
             </Button>
-            <CardTitle className="text-2xl font-bold">Paturain Racer</CardTitle>
-            <Button variant="ghost" onClick={toggleMute} className="text-white hover:bg-white/20">
-              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            <CardTitle className="text-3xl font-bold text-white drop-shadow-lg">
+              Paturain Racer
+            </CardTitle>
+            <Button
+              variant="ghost"
+              onClick={toggleMute}
+              className="text-white hover:bg-white/20 transition-all duration-300 rounded-full p-3"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+            >
+              {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
             </Button>
           </div>
         </CardHeader>
@@ -367,23 +413,23 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
         {/* Audio elements */}
         <audio
           ref={startSoundRef}
-          src="/game-start.mp3"
+          src="/sounds/game-start.mp3"
           preload="auto"
         />
         <audio
           ref={drivingSoundRef}
-          src="/car-driving.mp3"
+          src="/sounds/car-driving.mp3"
           preload="auto"
           crossOrigin="anonymous"
         />
         <audio
           ref={gameOverSoundRef}
-          src="/game-over.mp3"
+          src="/sounds/game-over.mp3"
           preload="auto"
         />
 
-        <CardContent className="p-6">
-          <div className="flex flex-col gap-6">
+        <CardContent className="p-8" style={{ backgroundColor: '#f5f5f5' }}>
+          <div className="flex flex-col gap-8">
             {/* Game Canvas */}
             <div className="flex justify-center">
               <div className="relative">
@@ -391,17 +437,23 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
                   ref={canvasRef}
                   width={CANVAS_WIDTH}
                   height={CANVAS_HEIGHT}
-                  className="border-4 rounded-lg shadow-lg"
-                  style={{ borderColor: '#2E59C9' }}
+                  className="border-4 rounded-2xl shadow-2xl"
+                  style={{
+                    borderColor: '#2f57a4',
+                    boxShadow: '0 20px 40px rgba(47, 87, 164, 0.3)'
+                  }}
                 />
 
                 {gameOver && (
-                  <div className="absolute inset-0 bg-black/75 flex items-center justify-center rounded-lg">
-                    <div className="text-center text-white">
-                      <h3 className="text-2xl font-bold mb-2">Game Over!</h3>
-                      <p className="mb-4">Score: {score}</p>
-                      <Button onClick={startGame} style={{ backgroundColor: '#2E59C9' }}>
-                        <Play className="w-4 h-4 mr-2" />
+                  <div className="absolute inset-0 bg-black/80 flex items-center justify-center rounded-2xl backdrop-blur-sm">
+                    <div className="text-center text-white p-8 rounded-2xl" style={{ backgroundColor: 'rgba(47, 87, 164, 0.9)' }}>
+                      <h3 className="text-3xl font-bold mb-4">Game Over!</h3>
+                      <p className="text-xl mb-6">Score: {score}</p>
+                      <Button
+                        onClick={startGame}
+                        className="bg-white text-blue-600 hover:bg-gray-100 font-bold px-8 py-3 rounded-full transition-all duration-300 hover:scale-105"
+                      >
+                        <Play className="w-5 h-5 mr-2" />
                         Opnieuw Spelen
                       </Button>
                     </div>
@@ -411,55 +463,96 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
             </div>
 
             {/* Game Info */}
-            <div className="flex flex-col md:flex-row gap-4 justify-center">
-              <Card style={{ backgroundColor: '#f8faff', borderColor: '#2E59C9' }} className="flex-1 max-w-xs">
-                <CardContent className="p-4">
-                  <div className="text-center space-y-2">
-                    <div>
-                      <p className="text-sm text-gray-600">Score</p>
-                      <p className="text-2xl font-bold" style={{ color: '#2E59C9' }}>{score}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Score Card */}
+              <Card className="border-0 shadow-lg overflow-hidden" style={{ backgroundColor: '#fff6d9' }}>
+                <CardContent className="p-6 text-center">
+                  <div className="space-y-4">
+                    <div className="p-4 rounded-full" style={{ backgroundColor: '#2f57a4' }}>
+                      <p className="text-sm text-white font-medium mb-1">Score</p>
+                      <p className="text-3xl font-bold text-white">{score}</p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">Bonus Points</p>
-                      <p className="text-xl font-semibold" style={{ color: '#2E59C9' }}>{bonusPoints}</p>
+                    <div className="p-3 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+                      <p className="text-sm text-gray-600 mb-1">Bonus Points</p>
+                      <p className="text-xl font-semibold" style={{ color: '#2f57a4' }}>{bonusPoints}</p>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-600">High Score</p>
-                      <p className="text-xl font-semibold" style={{ color: '#2E59C9' }}>{highScore}</p>
+                    <div className="p-3 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+                      <p className="text-sm text-gray-600 mb-1">High Score</p>
+                      <p className="text-xl font-semibold" style={{ color: '#2f57a4' }}>{highScore}</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              <div className="flex flex-col gap-2 max-w-xs">
-                {!isPlaying && !gameOver && (
-                  <Button onClick={startGame} className="w-full" style={{ backgroundColor: '#2E59C9' }}>
-                    <Play className="w-4 h-4 mr-2" />
-                    Start Spel
-                  </Button>
-                )}
+              {/* Controls Card */}
+              <Card className="border-0 shadow-lg overflow-hidden" style={{ backgroundColor: '#fff6d9' }}>
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    {!isPlaying && !gameOver && (
+                      <Button
+                        onClick={startGame}
+                        className="w-full py-4 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105"
+                        style={{
+                          backgroundColor: '#2f57a4',
+                          color: 'white'
+                        }}
+                      >
+                        <Play className="w-5 h-5 mr-2" />
+                        Start Spel
+                      </Button>
+                    )}
 
-                {isPlaying && (
-                  <Button onClick={togglePause} className="w-full" style={{ backgroundColor: '#2E59C9' }}>
-                    <Pause className="w-4 h-4 mr-2" />
-                    Pauzeer
-                  </Button>
-                )}
+                    {isPlaying && (
+                      <Button
+                        onClick={togglePause}
+                        className="w-full py-4 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105"
+                        style={{
+                          backgroundColor: '#2f57a4',
+                          color: 'white'
+                        }}
+                      >
+                        <Pause className="w-5 h-5 mr-2" />
+                        Pauzeer
+                      </Button>
+                    )}
 
-                <Button onClick={resetGame} variant="outline" className="w-full" style={{ borderColor: '#2E59C9', color: '#2E59C9' }}>
-                  <RotateCcw className="w-4 h-4 mr-2" />
-                  Reset
-                </Button>
-              </div>
+                    <Button
+                      onClick={resetGame}
+                      variant="outline"
+                      className="w-full py-3 rounded-xl transition-all duration-300 hover:scale-105"
+                      style={{
+                        borderColor: '#2f57a4',
+                        color: '#2f57a4',
+                        backgroundColor: 'transparent'
+                      }}
+                    >
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      Reset
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
 
-              <Card style={{ backgroundColor: '#f8faff', borderColor: '#2E59C9' }} className="flex-1 max-w-xs">
-                <CardContent className="p-4">
-                  <h4 className="font-semibold mb-2" style={{ color: '#2E59C9' }}>Besturing:</h4>
-                  <div className="text-sm space-y-1">
-                    <p>↑ ↓ Pijltjestoetsen om te sturen</p>
-                    <p>Ontwijt de rode auto's!</p>
-                    <p>Vang de Paturain verpakkingen voor 50 bonus punten!</p>
-                    <p>Hoe langer je overleeft, hoe sneller het wordt!</p>
+              {/* Instructions Card */}
+              <Card className="border-0 shadow-lg overflow-hidden" style={{ backgroundColor: '#fff6d9' }}>
+                <CardContent className="p-6">
+                  <h4 className="font-bold mb-4 text-lg" style={{ color: '#2f57a4' }}>Besturing:</h4>
+                  <div className="space-y-3 text-sm">
+                    <div className="p-3 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+                      <p className="font-medium" style={{ color: '#2f57a4' }}>↑ ↓ Pijltjestoetsen</p>
+                      <p className="text-gray-600">om te sturen</p>
+                    </div>
+                    <div className="p-3 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+                      <p className="font-medium" style={{ color: '#2f57a4' }}>🚗 Ontwijt de rode auto's!</p>
+                    </div>
+                    <div className="p-3 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+                      <p className="font-medium" style={{ color: '#2f57a4' }}>📦 Vang verpakkingen</p>
+                      <p className="text-gray-600">voor 50 bonus punten!</p>
+                    </div>
+                    <div className="p-3 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+                      <p className="font-medium" style={{ color: '#2f57a4' }}>⚡ Hoe langer je overleeft</p>
+                      <p className="text-gray-600">hoe sneller het wordt!</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
