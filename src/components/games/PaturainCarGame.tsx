@@ -543,7 +543,7 @@ const PaturainCarGame = ({ onBackToMenu }: PaturainCarGameProps) => {
                       <p className="text-gray-600">om te sturen</p>
                     </div>
                     <div className="p-3 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
-                      <p className="font-medium" style={{ color: '#2f57a4' }}>🚗 Ontwijt de rode auto's!</p>
+                      <p className="font-medium" style={{ color: '#2f57a4' }}>🚗 Ontwijk de rode auto's!</p>
                     </div>
                     <div className="p-3 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
                       <p className="font-medium" style={{ color: '#2f57a4' }}>📦 Vang verpakkingen</p>
